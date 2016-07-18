@@ -1,11 +1,5 @@
 local MESSAGE_HANDLER_PROTOCOL = "MESSAGE_HANDLER"
 
-local messageFormat = {
-	ID = math.random(0, 2^24),
-	type = {"request", "queued", "result"},
-	body = messageData,
-}
-
 local function check(response, packet)
 	if not type(response) == "table" then
 		return false
@@ -16,15 +10,15 @@ local function check(response, packet)
 end
 
 local function waitForResponse(recipientID, packet, protocol, timeout)
-	local thisTimeout = timeout
+	local currentTimeout = timeout
 	local startTime = os.clock()
 	while true do
-		local senderID, response = rednet.receive(protocol, thisTimeout)
+		local senderID, response = rednet.receive(protocol, currentTimeout)
 		if senderID then
 			if senderID == recipientID and check(response, packet) then
 				return response
 			else
-				thisTimeout = math.max(0, timeout - (os.clock() - startTime))
+				currentTimeout = math.max(0, timeout - (os.clock() - startTime))
 			end
 		else
 			return false

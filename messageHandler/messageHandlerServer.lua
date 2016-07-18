@@ -17,19 +17,19 @@ local messageHandlerServerMethods = {
 				local senderID, message = rednet.receive(self.protocol)
 				if type(message) == "table" and type(message.ID) == "number" and message.type == "request" then
 					local reply
-					if self.results[message.ID] then
+					if self.resultList[message.ID] then
 						reply = {
 							ID = message.ID,
 							type = "result",
-							body = self.results[message.ID],
+							body = self.resultList[message.ID],
 						}
 					else
-						if not self.list[message.ID] then
-							self.list[message.ID] = {
+						if not self.queuedList[message.ID] then
+							self.queuedList[message.ID] = {
 								senderID = senderID,
 								body = message.body,
 							}
-							table.insert(self.queue, message.ID)
+							table.insert(self.orderedQueue, message.ID)
 							os.queueEvent("message_handler_server_queued")
 						end
 						reply = {
@@ -45,7 +45,7 @@ local messageHandlerServerMethods = {
 			while true do
 				local _, timer = os.pullEvent("timer")
 				if self.resultTimers[timer] then
-					self.results[self.resultTimers[timer]] = nil
+					self.resultList[self.resultTimers[timer]] = nil
 					self.resultTimers[timer] = nil
 				end
 			end
@@ -53,14 +53,14 @@ local messageHandlerServerMethods = {
 		local function processMessages()
 			while true do
 				os.pullEvent("message_handler_server_queued")
-				if #self.queue > 0 then
-					local messageID = table.remove(self.queue, 1)
-					local message = self.list[messageID]
-					self.list[messageID] = nil
+				if #self.orderedQueue > 0 then
+					local messageID = table.remove(self.orderedQueue, 1)
+					local message = self.queuedList[messageID]
+					self.queuedList[messageID] = nil
 					
 					local result = {self.messageHandlerFunc(message.body)}
 					
-					self.results[messageID] = result
+					self.resultList[messageID] = result
 					self.resultTimers[os.startTimer(5)] = messageID
 					
 					local reply = {
@@ -70,7 +70,7 @@ local messageHandlerServerMethods = {
 					}
 					rednet.send(message.senderID, reply, self.protocol)
 					
-					if #self.queue > 0 then
+					if #self.orderedQueue > 0 then
 						os.queueEvent("message_handler_server_queued")
 					end
 				end
@@ -91,9 +91,9 @@ function new(messageHandlerFunc, optional_protocol)
 	local messageHandlerServer = {
 		messageHandlerFunc = messageHandlerFunc,
 		protocol = MESSAGE_HANDLER_PROTOCOL,
-		queue = {},
-		list = {},
-		results = {},
+		orderedQueue = {},
+		queuedList = {},
+		resultList = {},
 		resultTimers = {},
 	}
 	if optional_protocol then
