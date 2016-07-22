@@ -12,47 +12,44 @@ local messageHandlerServerMethods = {
 		return false
 	end,
 	Run = function(self)
-		local function queueMessages()
-			while true do
-				local senderID, message = rednet.receive(self.protocol)
-				if type(message) == "table" and type(message.ID) == "number" and message.type == "request" then
-					local reply
-					if self.resultList[message.ID] then
-						reply = {
-							ID = message.ID,
-							type = "result",
-							body = self.resultList[message.ID],
-						}
-					else
-						if not self.queuedList[message.ID] then
-							self.queuedList[message.ID] = {
-								senderID = senderID,
-								body = message.body,
+		local event
+		while true do
+			event = {os.pullEvent()}
+			if event[1] == "rednet_message" then
+				local senderID, message, protocol = event[2], event[3], event[4]
+				if protocol == self.protocol then
+					if type(message) == "table" and type(message.ID) == "number" and message.type == "request" then
+						local reply
+						if self.resultList[message.ID] then
+							reply = {
+								ID = message.ID,
+								type = "result",
+								body = self.resultList[message.ID],
 							}
-							table.insert(self.orderedQueue, message.ID)
-							os.queueEvent("message_handler_server_queued")
+						else
+							if not self.queuedList[message.ID] then
+								self.queuedList[message.ID] = {
+									senderID = senderID,
+									body = message.body,
+								}
+								table.insert(self.orderedQueue, message.ID)
+								os.queueEvent("message_handler_server_queued")
+							end
+							reply = {
+								ID = message.ID,
+								type = "queued",
+							}
 						end
-						reply = {
-							ID = message.ID,
-							type = "queued",
-						}
+						rednet.send(senderID, reply, self.protocol)
 					end
-					rednet.send(senderID, reply, self.protocol)
 				end
-			end
-		end
-		local function clearResults()
-			while true do
-				local _, timer = os.pullEvent("timer")
+			elseif event[1] == "timer" then
+				local timer = event[2]
 				if self.resultTimers[timer] then
 					self.resultList[self.resultTimers[timer]] = nil
 					self.resultTimers[timer] = nil
 				end
-			end
-		end
-		local function processMessages()
-			while true do
-				os.pullEvent("message_handler_server_queued")
+			elseif event[1] == "message_handler_server_queued" then
 				if #self.orderedQueue > 0 then
 					local messageID = table.remove(self.orderedQueue, 1)
 					local message = self.queuedList[messageID]
@@ -76,7 +73,6 @@ local messageHandlerServerMethods = {
 				end
 			end
 		end
-		parallel.waitForAny(queueMessages, clearResults, processMessages)
 	end,
 }
 local messageHandlerServerMetatable = {__index = messageHandlerServerMethods}
