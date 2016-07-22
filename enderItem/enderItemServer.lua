@@ -121,39 +121,38 @@ requestHandlers = {
 		local currentStack
 		
 		for stackNum, stack in pairs(contents) do
-			if not checkStackNum(stackNum, inventorySize) then
-				break
-			end
-			currentStack = currentStacks[stackNum]
-			if stack == false then
-				if currentStack then
-					emptySlot(stackNum, currentStack.basic().qty)
-				end
-			elseif checkFingerprint(stack) and checkAmount(stack.qty) then
-				local quantityRequired
-				if currentStack then -- there is something currently in the slot
-					currentStack = currentStack.basic()
-					if fingerprintsEqual(stack, currentStack) then -- is the same stack as being requested
-						quantityRequired = stack.qty - currentStack.qty
-					else -- is a different stack
-						if emptySlot(stackNum, currentStack.qty) then -- is different stack so empty slot
-							quantityRequired = stack.qty
-						else -- failed to empty the slot
-							quantityRequired = 0
+			if checkStackNum(stackNum, inventorySize) then
+				currentStack = currentStacks[stackNum]
+				if stack == false then
+					if currentStack then
+						emptySlot(stackNum, currentStack.basic().qty)
+					end
+				elseif checkFingerprint(stack) and checkAmount(stack.qty) then
+					local quantityRequired
+					if currentStack then -- there is something currently in the slot
+						currentStack = currentStack.basic()
+						if fingerprintsEqual(stack, currentStack) then -- is the same stack as being requested
+							quantityRequired = stack.qty - currentStack.qty
+						else -- is a different stack
+							if emptySlot(stackNum, currentStack.qty) then -- is different stack so empty slot
+								quantityRequired = stack.qty
+							else -- failed to empty the slot
+								quantityRequired = 0
+							end
 						end
+					else -- slot is currently empty
+						quantityRequired = stack.qty
 					end
-				else -- slot is currently empty
-					quantityRequired = stack.qty
-				end
-				
-				-- move quantityRequired into stackNum
-				if quantityRequired > 0 then
-					local storedItems = peripheral.call(interfaceSide, "getItemDetail", stack)
-					if storedItems then
-						peripheral.call(interfaceSide, "exportItem", stack, interfaceToChestDir, quantityRequired, stackNum)
+					
+					-- move quantityRequired into stackNum
+					if quantityRequired > 0 then
+						local storedItems = peripheral.call(interfaceSide, "getItemDetail", stack)
+						if storedItems then
+							peripheral.call(interfaceSide, "exportItem", stack, interfaceToChestDir, quantityRequired, stackNum)
+						end
+					elseif quantityRequired < 0 then
+						emptySlot(stackNum, -quantityRequired)
 					end
-				elseif quantityRequired < 0 then
-					emptySlot(stackNum, -quantityRequired)
 				end
 			end
 		end
