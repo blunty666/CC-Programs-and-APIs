@@ -1,5 +1,5 @@
 local routineHandlerMethods = {
-	Add = function(self, func, arguments)
+	Add = function(self, func, ...)
 		if type(func) == "function" and (not self.maxRoutines or #self.list >= self.maxRoutines) then
 			local routineID
 			repeat
@@ -11,7 +11,7 @@ local routineHandlerMethods = {
 				filter = nil,
 			}
 
-			local ok, passback = coroutine.resume(routine.thread, unpack(type(arguments) == "table" and arguments or {}))
+			local ok, passback = coroutine.resume(routine.thread, ...)
 			if not ok then
 				printError("routineHandler - Add: "..passback)
 				return false
