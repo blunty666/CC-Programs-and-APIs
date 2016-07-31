@@ -66,7 +66,6 @@ local routineHandlerMethods = {
 	end,
 	Run = function(self)
 		while true do
-			local event = {os.pullEvent()}
 			self:HandleEvent(os.pullEvent())
 		end
 	end,
