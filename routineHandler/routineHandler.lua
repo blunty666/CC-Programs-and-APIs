@@ -41,30 +41,33 @@ local routineHandlerMethods = {
 		end
 		return false
 	end,
+	HandleEvent = function(self, eventType, ...)
+		local newOrderedList = {}
+		for _, routineID in ipairs(self.orderedList) do
+			local routine = self.list[routineID]
+			if routine then
+				if routine.filter == nil or routine.filter == eventType or eventType == "terminate" then
+					local ok, passback = coroutine.resume(routine.thread, eventType, ...)
+					if not ok then
+						printError("routineHandler - Run: "..passback)
+						self.list[routineID] = nil
+					elseif coroutine.status(routine.thread) == "dead" then
+						self.list[routineID] = nil
+					else
+						routine.filter = passback
+						table.insert(newOrderedList, routineID)
+					end
+				else
+					table.insert(newOrderedList, routineID)
+				end
+			end
+		end
+		self.orderedList = newOrderedList
+	end,
 	Run = function(self)
 		while true do
 			local event = {os.pullEvent()}
-			local newOrderedList = {}
-			for _, routineID in ipairs(self.orderedList) do
-				local routine = self.list[routineID]
-				if routine then
-					if routine.filter == nil or routine.filter == event[1] or event[1] == "terminate" then
-						local ok, passback = coroutine.resume(routine.thread, unpack(event))
-						if not ok then
-							printError("routineHandler - Run: "..passback)
-							self.list[routineID] = nil
-						elseif coroutine.status(routine.thread) == "dead" then
-							self.list[routineID] = nil
-						else
-							routine.filter = passback
-							table.insert(newOrderedList, routineID)
-						end
-					else
-						table.insert(newOrderedList, routineID)
-					end
-				end
-			end
-			self.orderedList = newOrderedList
+			self:HandleEvent(os.pullEvent())
 		end
 	end,
 }
