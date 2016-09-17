@@ -3,6 +3,8 @@ local string_byte = string.byte
 local string_len = string.len
 local string_find = string.find
 local string_sub = string.sub
+local string_gsub = string.gsub
+local string_rep = string.rep
 
 -- STRING CONSTANTS
 local stringPattern = "^[^\"\\]+"
@@ -147,7 +149,7 @@ decodeArray = function(str, pos)
 	return array, currPos + 1
 end
 
--- PUBLIC FUNCTIONS
+-- PUBLIC DECODE FUNCTIONS
 function decode(str)
 	if type(str) ~= "string" then
 		error("decode: string expected, got "..type(str), 2)
@@ -169,4 +171,108 @@ function decodeFromFile(path)
 			end
 		end
 	end
+end
+
+-- ENCODING
+local encodeValue, encodeString, encodeNumber, encodeBoolean, encodeArray, encodeObject
+
+local function makeReadable(value, tabCount)
+	return "\n"..string_rep("\t", tabCount)..value
+end
+
+local function isArray(value)
+	local arraySize = 0
+	for index, _ in pairs(value) do
+		if type(index) ~= "number" then
+			return false
+		elseif index < 1 then
+			return false
+		elseif math.floor(index) ~= index then
+			return false -- not an integer
+		end
+		if index > arraySize then
+			arraySize = index
+		end
+	end
+	return arraySize
+end
+
+encodeValue = function(value, tabCount, tracking)
+	local valueType = type(value)
+	if valueType == "string" then
+		return encodeString(value)
+	elseif valueType == "number" then
+		return encodeNumber(value)
+	elseif valueType == "boolean" then
+		return encodeBoolean(value)
+	elseif valueType == "table" then
+		if tracking[value] then
+			error("Cannot encode table with recursive entries", 0)
+		end
+		tracking[value] = true
+		local arraySize = isArray(value)
+		if arraySize then
+			return encodeArray(value, tabCount, tracking, arraySize)
+		else
+			return encodeObject(value, tabCount, tracking)
+		end
+	end
+	return "null"
+end
+
+local controlChars = {
+	["\""] = "\\\"",
+	["\\"] = "\\\\",
+	["\/"] = "\\/",
+	["\b"] = "\\b",
+	["\f"] = "\\f",
+	["\n"] = "\\n",
+	["\r"] = "\\r",
+	["\t"] = "\\t",
+}
+encodeString = function(value)
+	return '"'..string_gsub(value, "[\"\\&c]", controlChars)..'"'
+end
+
+encodeNumber = function(value)
+	if value == math.huge then
+		return "1e1000"
+	elseif value == -math.huge then
+		return "-1e1000"
+	end
+	return tostring(value)
+end
+
+encodeBoolean = function(value)
+	return tostring(value)
+end
+
+encodeArray = function(array, tabCount, tracking, arraySize)
+	if arraySize > 0 then
+		local _array = "["
+		for index = 1, arraySize do
+			local value = encodeValue(array[index], tabCount and tabCount + 1 or false, tracking)..","
+			_array = _array..((tabCount and makeReadable(value, tabCount + 1)) or value)
+		end
+		return _array..((tabCount and makeReadable("]", tabCount)) or "]")
+	end
+	return "[]"
+end
+
+encodeObject = function(object, tabCount, tracking)
+	local _object = "{"
+	for index, value in pairs(object) do
+		if type(index) ~= "string" then
+			error("Object index must be a string", 0)
+		end
+		local _value = encodeString(index)..((tabCount and ": ") or ":")
+		_value = _value..encodeValue(value, tabCount and tabCount + 1 or false, tracking)..","
+		_object = _object..((tabCount and makeReadable(_value, tabCount + 1)) or _value)
+	end
+	return _object..((tabCount and makeReadable("}", tabCount)) or "}")
+end
+
+-- PUBLIC ENCODE FUNCTION
+function encode(value, readable)
+	return encodeValue(value, readable == true and 0 or false, {})
 end
