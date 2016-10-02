@@ -65,9 +65,17 @@ local routineHandlerMethods = {
 		self.orderedList = newOrderedList
 	end,
 	Run = function(self)
-		while true do
+		self.running = true
+		while self.running do
 			self:HandleEvent(os.pullEvent())
 		end
+	end,
+	Stop = function(self)
+		if self.running then
+			self.running = false
+			return true
+		end
+		return false
 	end,
 }
 local routineHandlerMetatable = {__index = routineHandlerMethods}
@@ -80,6 +88,7 @@ function new(maxRoutines)
 		list = {},
 		orderedList = {},
 		maxRoutines = maxRoutines and math.floor(maxRoutines),
+		running = false,
 	}
 	return setmetatable(routineHandler, routineHandlerMetatable)
 end
