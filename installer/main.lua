@@ -1,5 +1,5 @@
 local rootURL = "https://raw.githubusercontent.com"
-local fileListRepoUrl = "https://raw.githubusercontent.com/blunty666/CC-Programs-and-APIs/tree/master/installer/file_list/"
+local fileListRepoUrl = "https://raw.githubusercontent.com/blunty666/CC-Programs-and-APIs/master/installer/file_list/"
 
 local function get(url)
 	local response = http.get(url)			
