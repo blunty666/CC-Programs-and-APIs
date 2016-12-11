@@ -1,4 +1,5 @@
 local rootURL = "https://raw.githubusercontent.com"
+local fileListRepoUrl = "https://raw.githubusercontent.com/blunty666/CC-Programs-and-APIs/tree/master/installer/file_list/"
 
 local function get(url)
 	local response = http.get(url)			
@@ -21,7 +22,7 @@ local function save(fileData, path)
 	end
 end
 
-local function install(fileList, noOverwrite, noDebug)
+local function install(fileList, overwrite, hideDebug)
 
 	local success = true
 
@@ -32,13 +33,13 @@ local function install(fileList, noOverwrite, noDebug)
 		local path = fs.combine(localPath, "")
 
 		if fs.exists(path) and fs.isDir(path) then
-			if not noDebug then
+			if not hideDebug then
 				printError("Cannot overwrite directory: "..path)
 				print("Skipping: ", path, " - ", url)
 			end
 			success = false
-		elseif fs.exists(path) and noOverwrite == true then
-			if not noDebug then
+		elseif fs.exists(path) and overwrite == false then
+			if not hideDebug then
 				printError("Cannot overwrite existing file: "..path)
 				print("Skipping: ", path, " - ", url)
 			end
@@ -46,18 +47,18 @@ local function install(fileList, noOverwrite, noDebug)
 			local fileData = get(url)			
 			if fileData then
 				if save(fileData, path) then
-					if not noDebug then
+					if not hideDebug then
 						print("Download successful: ", path)
 					end
 				else
-					if not noDebug then
+					if not hideDebug then
 						printError("Save failed: ", path)
 						print("Skipping: ", path, " - ", url)
 					end
 					success = false
 				end
 			else
-				if not noDebug then
+				if not hideDebug then
 					printError("Download failed: ", url)
 					print("Skipping: ", path, " - ", url)
 				end
@@ -66,7 +67,7 @@ local function install(fileList, noOverwrite, noDebug)
 		end
 	end
 
-	if not noDebug then
+	if not hideDebug then
 		if success then
 			print("All files installed successfully")
 		else
@@ -77,4 +78,34 @@ local function install(fileList, noOverwrite, noDebug)
 	return success
 end
 
-return install
+local tArgs = {...}
+
+-- check and download file list
+local listName = string.lower(tostring(tArgs[1]))
+local fileListUrl = fileListRepoUrl..listName
+local ok, err = http.checkURL(fileListUrl)
+if not ok then
+	printError("Invalid package name: "..listName)
+	printError("Got error: "..err)
+	return
+end
+local fileList = get(fileListUrl)
+if not fileList then
+	printError("Unable to download file list")
+	return
+end
+fileList = textutils.unserialise(fileList)
+if type(fileList) ~= "table" then
+	printError("Invalid file list, unable to proceed")
+	return
+end
+
+-- check overwrite args
+local overwrite = string.lower(tostring(tArgs[2]))
+overwrite = overwrite == "true"
+
+-- check debug args
+local hideDebug = string.lower(tostring(tArgs[3]))
+hideDebug = hideDebug == "true"
+
+install(fileList, overwrite, hideDebug)
