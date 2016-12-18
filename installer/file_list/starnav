@@ -1,0 +1,7 @@
+{
+	["aStar"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "aStar.lua"},
+	["pQueue"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "pQueue.lua"},
+	["location"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "location.lua"},
+	["starNav"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "starNav/starNav.lua"},
+	["tinyMap"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "maps/tinyMap.lua"},
+}

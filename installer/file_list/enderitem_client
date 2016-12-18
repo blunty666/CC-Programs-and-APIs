@@ -1,0 +1,4 @@
+{
+	["messageHandlerClient"] = {"blunty666", "CC-Programs-and-APIs", "master", "messageHandler/messageHandlerClient.lua"},
+	["enderItemClient"] = {"blunty666", "CC-Programs-and-APIs", "master", "enderItem/enderItemClient.lua"},
+}
