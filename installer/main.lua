@@ -40,8 +40,7 @@ local function install(fileList, overwrite, hideDebug)
 			success = false
 		elseif fs.exists(path) and overwrite == false then
 			if not hideDebug then
-				printError("Cannot overwrite existing file: "..path)
-				print("Skipping: ", path, " - ", url)
+				print("Skipping: ", path, " - file already exists")
 			end
 		else
 			local fileData = get(url)			
