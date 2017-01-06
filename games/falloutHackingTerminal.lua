@@ -2,7 +2,7 @@ local tArgs = {...}
 
 local function printUsage()
 	print("Usage:")
-	print(fs.getName(shell.getRunningProgram()).." <word_length> <can_terminate> <difficulty> <script_path> <password>")
+	print(fs.getName(shell.getRunningProgram()).." <word_length> <difficulty> <can_terminate> <script_path> <password>")
 end
 
 local wordLength = tonumber(tArgs[1])
