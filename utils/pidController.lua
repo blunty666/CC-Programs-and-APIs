@@ -47,13 +47,19 @@ local pidMethods = {
 		return false
 	end,
 
-	CalculateOutput = function(self, measured, deltaTime)
-		local thisError = self.setpoint - measured
-		self.integral = self.integral + thisError*deltaTime
-		local derivative = (thisError - self.prevError)/deltaTime
-		local output = self.Kp*thisError + self.Ki*self.integral + self.Kd*derivative
+	CalculateOutput = function(self, measured)
+		local currentTime = os.clock()
+		local deltaTime = currentTime - self.lastUpdateTime
+		self.lastUpdateTime = currentTime
+
+		local thisError = self.setpoint - measured -- proportional
+
+		self.integral = self.integral + thisError*deltaTime -- integral
+
+		local derivative = (thisError - self.prevError)/deltaTime -- derivative
 		self.prevError = thisError
-		return output
+
+		return self.Kp*thisError + self.Ki*self.integral + self.Kd*derivative
 	end,
 	Reset = function(self)
 		self.prevError = 0
@@ -75,6 +81,7 @@ function new(setpoint, Kp, Ki, Kd)
 		
 		prevError = 0,
 		integral = 0,
+		lastUpdateTime = os.clock(),
 	}
 	return setmetatable(pid, pidMetatable)
 end
