@@ -267,5 +267,5 @@ for requestID, requestType in ipairs(ID_TO_TYPE) do
 end
 
 --===== CREATE AND RUN MESSAGE HANDLER =====--
-local messageHandler = messageHandlerServer.new(handleRequest, "ENDER_ITEM")
+local messageHandler = messageHandlerServer.new(handleRequest, nil, "ENDER_ITEM")
 messageHandler:Run()

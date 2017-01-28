@@ -61,20 +61,30 @@ local function sendPacket(serverID, packet, protocol)
 	return false
 end
 
-function send(serverID, message, optional_protocol)
+local function newPacket(message, packetType, optional_protocol)
 	if optional_protocol ~= nil and type(optional_protocol) ~= "string" then
-		error("send: optional_protocol - string expected")
+		error("send: optional_protocol - string expected", 2)
 	end
 	local packet = {
 		ID = math.random(0, 2^24),
-		type = "request",
+		type = packetType,
 		body = message,
 	}
 	local protocol = MESSAGE_HANDLER_PROTOCOL
 	if optional_protocol then
 		protocol = protocol..":"..optional_protocol
 	end
+	return packet, protocol
+end
+
+function send(serverID, message, optional_protocol)
+	local packet, protocol = newPacket(message, "request", optional_protocol)
 	return sendPacket(serverID, packet, protocol)
+end
+
+function broadcast(message, optional_protocol)
+	local packet, protocol = newPacket(message, "broadcast", optional_protocol)
+	return rednet.broadcast(packet, protocol)
 end
 
 function findServer(optional_protocol)
