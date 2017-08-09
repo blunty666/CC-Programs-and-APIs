@@ -107,4 +107,6 @@ overwrite = overwrite == "true"
 local hideDebug = string.lower(tostring(tArgs[3]))
 hideDebug = hideDebug == "true"
 
+http.request("https://www.the-gables.synology.me/computercraft/download_counter.php", "program="..listName.."&version="..os.version())
+
 install(fileList, overwrite, hideDebug)
