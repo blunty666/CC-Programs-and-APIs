@@ -1,11 +1,13 @@
 local BOX = {
 	WIDTH = 20,
-	HEIGHT = 7,
+	HEIGHT = 9,
 }
 
 local BUTTON = {
 	WIDTH = 18,
 }
+
+local TIMEOUT = 300 -- cache quotes for 5 minutes
 
 local URL = "https://raw.githubusercontent.com/blunty666/CC-Programs-and-APIs/master/games/WhereIsDan/quotes.lua"
 
@@ -129,7 +131,7 @@ local function writeText(xPos, yPos, text, bgCol, textCol)
 end
 
 local function writeTextAligned(text, xPos, yPos, bgCol, textCol)
-	local startX = xPos - math.floor(#text/2)
+	local startX = xPos - math.ceil(#text/2)
 	writeText(startX, yPos, text, bgCol, textCol)
 end
 
@@ -138,14 +140,25 @@ local function drawButton(colour)
 	writeTextAligned("WHERE IS DAN?", BOX.BUTTON_TEXT.X, BOX.BUTTON_TEXT.Y, colour, colours.white)
 end
 
+local function searchBarTimer()
+	return math.random() / 4
+end
+
 local function handleEvents()
+	local quotes = {
+	}
+	local requested = false
+	local cachedTime = -(math.huge)
+
 	local clicked = false
-	local event = {os.pullEvent()}
+
+	local updateTimer = false
+	local counter = 1
+
+	local event = {os.pullEventRaw()}
 	while true do
-		if event[1] == "key" then
-			if event[2] == keys.backspace then
-				break
-			end
+		if event[1] == "terminate" or (event[1] == "char" and string.lower(event[2]) == "q") then
+			break
 		elseif event[1] == "mouse_click" then
 			if event[2] == 1 and (BOX.BUTTON.X_MIN <= event[3] and event[3] <= BOX.BUTTON.X_MAX) and (BOX.BUTTON.Y_MIN <= event[4] and event[4] <= BOX.BUTTON.Y_MAX) then
 				clicked = true
@@ -154,15 +167,41 @@ local function handleEvents()
 		elseif event[1] == "mouse_up" then
 			if clicked then
 				drawButton(colours.green)
-				http.request(URL)
+				if os.clock() - cachedTime > TIMEOUT then
+					if not requested then
+						http.request(URL)
+						requested = true
+					end
+				end
+				if not updateTimer then
+					updateTimer = os.startTimer(searchBarTimer())
+					writeText(BOX.X_MIN, BOX.TEXT.Y, string.rep(" ", BOX.WIDTH), colours.black)
+					writeTextAligned("Searching for Dan...", BOX.TEXT.X, BOX.TEXT.Y + 1, colours.black, colours.white)
+				end
 				clicked = false
 			end
 		elseif event[1] == "http_success" and event[2] == URL then
-			local quotes = textutils.unserialise(event[3].readAll())
-			writeText(BOX.X_MIN, BOX.TEXT.Y, string.rep(" ", BOX.WIDTH), colours.black)
-			writeTextAligned(quotes[math.random(1, #quotes)], BOX.TEXT.X, BOX.TEXT.Y, colours.black, colours.white)
+
+			quotes = textutils.unserialise(event[3].readAll())
+			requested = false
+			cachedTime = os.clock()
+		
+		elseif event[1] == "timer" then
+			if event[2] == updateTimer then
+				if counter <= BOX.WIDTH - 2 then
+					writeText(BOX.X_MIN + 1, BOX.TEXT.Y, string.rep(" ", counter), colours.cyan)
+					updateTimer = os.startTimer(searchBarTimer())
+					counter = counter + 1
+				else
+					writeText(BOX.X_MIN, BOX.TEXT.Y, string.rep(" ", BOX.WIDTH), colours.black)
+					writeText(BOX.X_MIN, BOX.TEXT.Y + 1, string.rep(" ", BOX.WIDTH), colours.black)
+					writeTextAligned(quotes[math.random(1, #quotes)], BOX.TEXT.X, BOX.TEXT.Y, colours.black, colours.white)
+					updateTimer = false
+					counter = 1
+				end
+			end
 		end
-		event = {os.pullEvent()}
+		event = {os.pullEventRaw()}
 	end
 end
 
@@ -170,6 +209,7 @@ term.setBackgroundColour(colours.black)
 term.clear()
 
 drawButton(colours.green)
+writeTextAligned("Press 'q' to Quit", BOX.TEXT.X, BOX.TEXT.Y + 3, colours.black, colours.white)
 
 for i = 1, 25 do
 	local x = math.random(1, WIDTH)
@@ -179,7 +219,7 @@ for i = 1, 25 do
 	table.insert(particles, newParticle(x, y, colour, directionIndex))
 end
 
-parallel.waitForAny(updateParticles, handleEvents)
+parallel.waitForAny(handleEvents, updateParticles)
 
 term.setBackgroundColour(colours.black)
 term.setTextColour(colours.white)
