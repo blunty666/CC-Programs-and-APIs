@@ -146,6 +146,7 @@ end
 
 local function handleEvents()
 	local quotes = {
+		"<INSERT TEXT HERE>",
 	}
 	local requested = false
 	local cachedTime = -(math.huge)
