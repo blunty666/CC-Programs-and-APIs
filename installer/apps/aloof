@@ -1,0 +1,13 @@
+{
+	root = "aloof",
+	{
+		type = "github",
+		author = "blunty666",
+		repository = "Aloof",
+		branch = "master",
+
+		whitelist = {
+			".lua",
+		},
+	},
+}
