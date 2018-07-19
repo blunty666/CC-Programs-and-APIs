@@ -1,0 +1,12 @@
+{
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Pathfinding-and-Mapping/master/netNav/remoteControl.lua",
+		name = "netNavRemote",
+	},
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Programs-and-APIs/master/utils/buttonHandler.lua",
+		name = "buttonHandler",
+	},
+}

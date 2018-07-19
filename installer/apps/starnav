@@ -1,0 +1,27 @@
+{
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Pathfinding-and-Mapping/master/aStar.lua",
+		name = "aStar",
+	},
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Pathfinding-and-Mapping/master/pQueue.lua",
+		name = "pQueue",
+	},
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Pathfinding-and-Mapping/master/location.lua",
+		name = "location",
+	},
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Pathfinding-and-Mapping/master/starNav/starNav.lua",
+		name = "starNav",
+	},
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Pathfinding-and-Mapping/master/maps/tinyMap.lua",
+		name = "tinyMap",
+	},
+}

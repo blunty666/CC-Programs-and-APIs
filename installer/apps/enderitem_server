@@ -1,0 +1,12 @@
+{
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Programs-and-APIs/master/messageHandler/messageHandlerServer.lua",
+		name = "messageHandlerServer",
+	},
+	{
+		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Programs-and-APIs/master/enderItem/enderItemServer.lua",
+		name = "enderItemServer",
+	},
+}
