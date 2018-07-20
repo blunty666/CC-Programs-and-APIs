@@ -1,0 +1,14 @@
+{
+	root = "AloofNodesDemo",
+	{
+		type = "github",
+		author = "blunty666",
+		repository = "CC-Programs-and-APIs",
+		branch = "master",
+		repo_directory = "aloofPrograms/aloofNodesDemo",
+
+		whitelist = {
+			".lua",
+		},
+	},
+}
