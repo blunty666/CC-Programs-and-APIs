@@ -123,9 +123,11 @@ decodeObject = function(str, pos)
 		
 		object[key] = value
 		
-		currPos = findNext(str, currPos, commaPattern)
-		if not currPos then
-			return object, string_len(str) + 1
+		local nextPos = findNext(str, currPos, commaPattern)
+		if not nextPos then
+			return object, findNext(str, currPos, "}")
+		else
+			currPos = nextPos
 		end
 	end
 	return object, currPos + 1
@@ -141,9 +143,11 @@ decodeArray = function(str, pos)
 		array[index] = value
 		index = index + 1
 		
-		currPos = findNext(str, currPos, commaPattern)
-		if not currPos then
-			return array, string_len(str) + 1
+		local nextPos = findNext(str, currPos, commaPattern)
+		if not nextPos then
+			return array, findNext(str, currPos, "]")
+		else
+			currPos = nextPos
 		end
 	end
 	return array, currPos + 1
