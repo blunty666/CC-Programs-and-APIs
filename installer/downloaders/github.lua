@@ -6,10 +6,9 @@ local GITHUB_API_URL = "https://api.github.com"
 local GITHUB_RAW_URL = "https://raw.githubusercontent.com"
 
 if not INSTALLER.UTILS.JSON then
-	-- get json file
-	-- load json file
-	-- add json to INSTALLER.UTILS
-	-- throw error if fails
+	local loaded, err = INSTALLER.UTILS.getAndLoad(JSON_URL, "json.lua")
+	if not loaded then error("unable to fetch json library, got error: "..err) end
+	INSTALLER.UTILS.JSON = loaded
 end
 
 local function getFileList(author, repository, branch, directory)
