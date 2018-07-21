@@ -1,7 +1,7 @@
 --===== RAW DOWNLOADER =====--
 local INSTALLER = (...)
 
-local function check(downloadData)
+function check(downloadData)
 	-- check for required args
 		-- check for url
 		-- check for name
@@ -12,7 +12,7 @@ local function check(downloadData)
 	return true
 end
 
-local function list(root, downloadData)
+function list(root, downloadData)
 	local dir
 	if downloadData.root then -- if root is specified in downloadData then overwrite packageData root
 		dir = downloadData.root
