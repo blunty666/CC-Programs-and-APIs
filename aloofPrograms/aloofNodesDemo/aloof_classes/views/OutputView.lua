@@ -57,6 +57,7 @@ methods = {
 					if itemID == self.selectedID then
 						self.canUpdateCheckBox.isActive = item[2]
 						self.canRemoveCheckBox.isActive = item[3]
+						self.choiceBox.label.text = itemID.." - "..item[1]
 					end
 				end
 			elseif event[2] == "item_remove" then

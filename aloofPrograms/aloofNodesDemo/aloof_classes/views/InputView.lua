@@ -63,6 +63,9 @@ methods = {
 							break
 						end
 					end
+					if itemID == self.selectedID then
+						self.selectedItemText.text = tostring(item[ItemList.ITEM_TEXT])
+					end
 				end
 			elseif event[2] == "item_remove" then
 				local itemID = event[3]
