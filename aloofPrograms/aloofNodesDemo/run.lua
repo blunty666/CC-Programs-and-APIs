@@ -1,4 +1,4 @@
-local ALOOF_PATH = "rom/aloof"
+local ALOOF_PATH = "aloof"
 local PROGRAM_PATH = fs.getDir(shell.getRunningProgram())
 local pathList = {
 	fs.combine(ALOOF_PATH, "repo/blunty666/log"),
