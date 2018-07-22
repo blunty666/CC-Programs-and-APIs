@@ -1,7 +1,0 @@
-{
-	["aStar"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "aStar.lua"},
-	["pQueue"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "pQueue.lua"},
-	["location"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "location.lua"},
-	["netNav"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "netNav/netNav.lua"},
-	["remoteMap"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "maps/remoteMap/remoteMap.lua"},
-}

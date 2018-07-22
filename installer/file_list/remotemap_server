@@ -1,4 +1,0 @@
-{
-	["compactMap"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "maps/compactMap.lua"},
-	["mapServer"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "maps/remoteMap/remoteMap_server.lua"},
-}

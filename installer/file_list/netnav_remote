@@ -1,4 +1,0 @@
-{
-	["buttonHandler"] = {"blunty666", "CC-Programs-and-APIs", "master", "utils/buttonHandler.lua"},
-	["netNavRemote"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "netNav/remoteControl.lua"},
-}

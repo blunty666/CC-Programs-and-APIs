@@ -1,4 +1,0 @@
-{
-	["remoteMap"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "maps/remoteMap/remoteMap.lua"},
-	["mapViewer"] = {"blunty666", "CC-Pathfinding-and-Mapping", "master", "maps/remoteMap/remoteMap_viewer.lua"},
-}
