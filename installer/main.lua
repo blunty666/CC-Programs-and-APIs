@@ -117,7 +117,7 @@ end
 if not tArgs[1] then return printError("No package name provided") end
 local pack = string.lower(tostring(tArgs[1]))
 if pack:len() == 0 then return printError("No package name provided") end
-if pack:find("%W") then return printError("Illegal package name provided, got: "..pack) end
+if pack:find("[^_%w]") then return printError("Illegal package name provided, got: "..pack) end
 print("Installing package '"..pack.."'")
 
 --===== CHECK CONFIG =====--
