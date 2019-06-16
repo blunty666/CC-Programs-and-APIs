@@ -16,6 +16,11 @@
 	},
 	{
 		type = "raw",
+		url = "https://raw.githubusercontent.com/blunty666/CC-Pathfinding-and-Mapping/master/netNav/scanStrategy.lua",
+		name = "scanStrategy",
+	},
+	{
+		type = "raw",
 		url = "https://raw.githubusercontent.com/blunty666/CC-Pathfinding-and-Mapping/master/netNav/netNav.lua",
 		name = "netNav",
 	},
